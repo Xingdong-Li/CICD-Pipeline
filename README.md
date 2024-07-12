@@ -12,3 +12,11 @@ To build and run the API, use the `run.sh` script:
 
 ```sh
 ./run.sh
+```
+
+## Test the API
+To test the API, use the `test.sh` script:
+
+```sh
+./test.sh
+```
