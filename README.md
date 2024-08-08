@@ -1,11 +1,24 @@
-# HW2 REST API
+# HW3 REST API
 
-## Description
-This project is a simple REST API with endpoints for GET, POST, PUT, and DELETE verbs. It uses Docker for containerization and includes automated tests.
+## Overview
+
+A brief description of the project and its purpose. This application is a REST API that provides CRUD operations for managing items, integrated with AWS services such as DynamoDB and S3 using Localstack for local testing.
+
+## Features
+
+- **Create, Read, Update, Delete (CRUD)** operations on items.
+- Stores item data in DynamoDB and S3.
+- Automated testing with Jest and Supertest.
+- Dockerized application and tests using Docker and Docker Compose.
+- Localstack integration for mocking AWS services.
 
 ## Prerequisites
+
 - Docker
-- Node.js
+- Docker Compose
+- Node.js (version 18 or later)
+- npm (version 7 or later)
+
 
 ## Running the API
 To build and run the API, use the `run.sh` script:
