@@ -1,20 +1,23 @@
-# Use the official Node.js image.
+# Use an official Node.js runtime as a parent image
 FROM node:18
 
-# Create and change to the app directory.
+# Set the working directory
 WORKDIR /app
 
-# Install app dependencies.
+# Copy the package.json and package-lock.json
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy app source code.
+# Copy the rest of the application code
 COPY . .
 
-ENV PORT=8080
+# Give execute permission to the wait-for-localstack.sh script
+RUN chmod +x ./wait-for-localstack.sh
 
-# Expose the port the app runs on.
-EXPOSE 8080
+# Expose the application port
+EXPOSE 3000
 
-# Start the app.
+# Define the command to run the application
 CMD ["node", "src/app.js"]

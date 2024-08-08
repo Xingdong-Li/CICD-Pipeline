@@ -41,8 +41,10 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: Set executable permissions for test.sh
-        run: chmod +x ./test.sh
+      - name: Set executable permissions for test.sh and wait-for-localstack.sh
+        run: |
+          chmod +x ./test.sh
+          chmod +x ./wait-for-localstack.sh
 
       - name: Run tests
         run: ./test.sh
