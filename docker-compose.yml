@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  localstack:
+    image: localstack/localstack
+    environment:
+      - SERVICES=dynamodb,s3
+      - DEBUG=1
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Add this line to mount the Docker socket
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - localstack
+    entrypoint: ["./wait-for-localstack.sh"]
+    command: ["node", "src/app.js"]
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-2
+      - DYNAMODB_ENDPOINT=http://localstack:4566
+      - S3_ENDPOINT=http://localstack:4566

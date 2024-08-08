@@ -1,22 +1,39 @@
-name: Node.js CI
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - hw3
   pull_request:
-    branches: [ main ]
-  workflow_dispatch: # This enables manual runs of the workflow
+    branches:
+      - hw3
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+          - 4566:4566
+        options: >-
+          --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock
+        env:
+          SERVICES: dynamodb,s3
+          DEBUG: 1
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'
-    - run: npm install
-    - run: npm test
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: ./test.sh
