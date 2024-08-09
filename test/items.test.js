@@ -18,7 +18,26 @@ describe('Items API', () => {
     description: 'A test item',
   };
 
-  it('should store JSON in the database and S3 bucket on POST request', async () => {
+  it('Sending a GET request that finds no results returns the appropriate response', async () => {
+    const res = await request(server).get(`/items/${testItem.id}`);
+    
+    expect(res.status).toBe(404);
+  });
+
+  it('Sending a GET request with no parameters returns the appropriate response', async () => {
+    const res = await request(server).get('/items/');
+    
+    expect(res.status).toBe(404);
+  });
+
+  it('Sending a GET request with incorrect parameters returns the appropriate response', async () => {
+    const res = await request(server).get(`/getItems/${testItem.id}`);
+    
+    expect(res.status).toBe(404);
+  });
+
+  // POST tests
+  it('Sending a POST request results in the JSON body being stored as an item in the database, and an object in an S3 bucket', async () => {
     const res = await request(server).post('/items').send(testItem);
     
     expect(res.status).toBe(201);
@@ -30,20 +49,23 @@ describe('Items API', () => {
     expect(getRes.body).toMatchObject(testItem);
   });
 
-  it('should return expected JSON from the database and S3 bucket on GET request', async () => {
+
+  it('Sending a GET request with appropriate parameters returns expected JSON from the database', async () => {
     const res = await request(server).get(`/items/${testItem.id}`);
     
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject(testItem);
   });
 
-  it('should return 404 for a GET request with a non-existing ID', async () => {
-    const res = await request(server).get('/items/non-existing-id');
+  it('Sending a duplicate POST request returns the appropriate response', async () => {
+    await request(server).post('/items').send(testItem);
+    const res = await request(server).post('/items').send(testItem);
     
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(400);
   });
 
-  it('should update the item in the database and S3 bucket on PUT request', async () => {
+  // PUT tests
+  it('Sending a PUT request that targets an existing resource results in updates to the appropriate item in the database and object in the S3 bucket', async () => {
     const updatedItem = { ...testItem, name: 'Updated Test Item' };
     const res = await request(server).put(`/items/${testItem.id}`).send(updatedItem);
     
@@ -56,14 +78,15 @@ describe('Items API', () => {
     expect(getRes.body).toMatchObject(updatedItem);
   });
 
-  it('should return 400 for duplicate POST request', async () => {
-    await request(server).post('/items').send(testItem);
-    const res = await request(server).post('/items').send(testItem);
+  it('Sending a PUT request with no valid target returns the appropriate response', async () => {
+    const res = await request(server).put('/items/non-existing-id').send(testItem);
     
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
   });
 
-  it('should delete the item from the database and S3 bucket on DELETE request', async () => {
+
+  // DELETE tests
+  it('Sending a DELETE request results in the appropriate item being removed from the database and object being removed from the S3 bucket', async () => {
     const res = await request(server).delete(`/items/${testItem.id}`);
     
     expect(res.status).toBe(200);
@@ -73,13 +96,7 @@ describe('Items API', () => {
     expect(getRes.status).toBe(404);
   });
 
-  it('should return 404 for PUT request with no valid target', async () => {
-    const res = await request(server).put('/items/non-existing-id').send(testItem);
-    
-    expect(res.status).toBe(404);
-  });
-
-  it('should return 404 for DELETE request with no valid target', async () => {
+  it('Sending a DELETE request with no valid target returns the appropriate response', async () => {
     const res = await request(server).delete('/items/non-existing-id');
     
     expect(res.status).toBe(404);
